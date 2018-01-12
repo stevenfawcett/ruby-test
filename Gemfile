@@ -19,6 +19,10 @@ gem 'jbuilder',                '2.7.0'
 group :development, :test do
   gem 'sqlite3', '1.3.13'
   gem 'byebug',  '9.0.6', platform: :mri
+  gem 'CFPropertyList',       '2.3.6'
+  gem 'unf_ext',              '0.0.7.4'
+  gem 'unf',                  '0.1.4'
+
 end
 
 group :development do
