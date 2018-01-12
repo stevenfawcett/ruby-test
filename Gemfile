@@ -22,7 +22,7 @@ group :development, :test do
   gem 'CFPropertyList',       '2.3.6'
   gem 'unf_ext',              '0.0.7.4'
   gem 'unf',                  '0.1.4'
-
+  gem 'reek'
 end
 
 group :development do
