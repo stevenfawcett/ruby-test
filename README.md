@@ -19,6 +19,7 @@ $ bundle install --without production
 
 Next, migrate the database:
 
+nnnnnnnnnn
 ```
 $ rails db:migrate
 ```
