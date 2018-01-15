@@ -24,9 +24,10 @@ class UserTest < ActiveSupport::TestCase
     @user.name = "a" * 51
     assert_not @user.valid?
   end
-  test "name should be longer than 4 " do
+
+  test "Username will not be less than 4 Characters Long" do
     @user.name = "a" * 3
-    assert @user.valid?
+    assert_not @user.valid?
   end
 
 

@@ -2,7 +2,10 @@ ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
 require "minitest/reporters"
+require 'simplecov'
 Minitest::Reporters.use!
+
+SimpleCov.start 'rails' unless ENV['NO_COVERAGE'] 
 
 class ActiveSupport::TestCase
   fixtures :all
