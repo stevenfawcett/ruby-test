@@ -1,5 +1,7 @@
 pipeline  {
-  agent any
+  agent {  
+    label 'Server'
+  }
   environment {
       CNAME = "ANCHORE_${env.BUILD_NUMBER}"
   }
@@ -8,6 +10,9 @@ pipeline  {
        steps{
             git credentialsId: '5f8e03c5-806e-4c4a-ba41-7ce91a97301c', 
                 url: 'git@github.com:stevenfawcett/ruby-test.git'
+            sh 'mkdir -p ${WORKSPACE}/coverage'
+            sh 'mkdir -p ${WORKSPACE}/security'
+            sh 'mkdir -p ${WORKSPACE}/smells'
        }
    }
    stage('Docker Build') {
@@ -18,22 +23,25 @@ pipeline  {
    }
    stage('Code Sniff Test') {
         steps {
-            sh 'docker run --rm localhost:5000/testruby:test reek app || true'
+            sh 'docker run --rm localhost:5000/testruby:test reek --format html app > ${WORKSPACE}/smells/index.html || true'
+            publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'smells', reportFiles: 'index.html', reportName: 'Code Smell Report', reportTitles: 'Smells'])
         }
    }
    stage('Unit Test') {
         steps {
-            sh 'docker run --rm localhost:5000/testruby:test rails test -v '
+            sh 'docker run --rm -v ${WORKSPACE}/coverage:/usr/src/app/coverage  localhost:5000/testruby:test rails test -v '
+            publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'coverage', reportFiles: 'index.html', reportName: 'Coverage Report', reportTitles: 'Coverage'])
         }
    }
    stage( 'Container Scanner') {
        steps {
            sh 'docker run -d -v /var/run/docker.sock:/var/run/docker.sock --name $CNAME anchore/cli:latest'
            sh 'docker exec $CNAME anchore analyze --image localhost:5000/testruby:test'
-           sh 'docker exec $CNAME anchore gate    --image localhost:5000/testruby:test || true'
-           sh 'docker exec $CNAME anchore audit   --image localhost:5000/testruby:test report || true'
+           sh 'docker exec $CNAME anchore --html  gate    --image localhost:5000/testruby:test         > ${WORKSPACE}/security/gate.html || true'
+           sh 'docker exec $CNAME anchore --html  audit   --image localhost:5000/testruby:test report  > ${WORKSPACE}/security/audit.html || true'
            sh 'docker stop $CNAME'
            sh 'docker rm $CNAME'
+           publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'security', reportFiles: 'audit.html,gate.html', reportName: 'Security Report', reportTitles: 'Security'])
        }
    }
   }
