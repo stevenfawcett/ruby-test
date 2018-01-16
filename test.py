@@ -22,7 +22,7 @@ class PythonTest(unittest.TestCase):
  
     def test_the_title_of_the_web_again(self):
         self.driver.get('https://www.google.com')
-        self.assertEqual( self.driver.title, 'Google')
+        self.assertEqual( self.driver.title, 'Not Google')
  
     @classmethod
     def tearDownClass(cls):
