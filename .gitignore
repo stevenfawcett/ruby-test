@@ -24,4 +24,9 @@
 /spring/*.pid
 
 # Ignore uploaded test images.
-/public/uploads
+/public/uploads__pycache__
+nosetests.xml
+core.*
+geckodriver.log
+res/
+__pycache__/
